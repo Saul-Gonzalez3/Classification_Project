@@ -156,7 +156,7 @@ I would definitely recommend further evaluation and consideration into the one a
 
 1. Clone this repo.
 
-2. Acquire the data from the Kaggle Bank Account Fraud Dataset Suite Dataset.
+2. Acquire the data from the Codeup's SQL Dataset.
 
 3. Put the data in the file containing the cloned repo.
 
