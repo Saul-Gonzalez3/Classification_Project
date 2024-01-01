@@ -191,7 +191,7 @@ def get_chi_tenure(train):
     
     null = "There is no association between tenure and churn"
     alpha = 0.05
-    observed6 = pd.crosstab(train.tenure, train.churn_encoded)
+    observed6 = pd.crosstab(train.monthly_charges_scaled, train.churn_encoded)
 
     chi2, p, degf, expected = stats.chi2_contingency(observed6)
     
@@ -397,7 +397,7 @@ def get_random_forest_test():
                             criterion='gini',
                             min_samples_leaf=3,
                             n_estimators=100,
-                            max_depth=3, 
+                            max_depth=7, 
                             random_state=123)
 
     
@@ -409,3 +409,178 @@ def get_random_forest_test():
     
     print('Accuracy of random forest classifier on test set: {:.2f}'
      .format(rf.score(X_test, y_test)))
+#------------------------------------------------------------------------------
+def heatmap_5(train):
+    heatmap_5 = train[['internet_service_type_Fiber optic', 'payment_type_Electronic check', 'monthly_charges', 'paperless_billing_encoded','paperless_billing_Yes']]
+    return heatmap_5
+#------------------------------------------------------------------------------
+def heatmap_10(train):
+    heatmap_10 = train[['internet_service_type_Fiber optic', 'payment_type_Electronic check', 'monthly_charges', 'paperless_billing_encoded','paperless_billing_Yes', 'senior_citizen', 'multiple_lines_Yes', 'streaming_movies_Yes', 'streaming_tv_Yes', 'phone_service_Yes' ]]
+    return heatmap_10
+
+#------------------------------------------------------------------------------
+def SelectK_Best_feats(train):
+    SelectK_Best_5 = train[['tenure', 'contract_type_Two year', 'internet_service_type_Fiber optic', 'internet_service_type_None', 'payment_type_Electronic check']]
+    return SelectK_Best_5
+#------------------------------------------------------------------------------
+def RFE_feats(train):
+    RFE_feats_5 = train[['dependents_encoded', 'phone_service_encoded', 'dependents_Yes', 'online_security_No internet service', 'streaming_movies_No internet service']]
+    return RFE_feats_5
+    
+    
+#------------------------------------------------------------------------------
+def get_SelectKBest_decision_tree(train, validate, test):
+    from sklearn.tree import DecisionTreeClassifier, export_text, plot_tree
+
+    X_train4 = train[['tenure_scaled', 'contract_type_Two year','internet_service_type_Fiber optic', 'internet_service_type_None','payment_type_Electronic check']]
+    y_train4 = train.churn_encoded
+    
+    X_validate4 = validate[['tenure_scaled', 'contract_type_Two year','internet_service_type_Fiber optic', 'internet_service_type_None','payment_type_Electronic check']]
+    y_validate4 = validate.churn_encoded
+    
+    X_test4 = test[['tenure_scaled', 'contract_type_Two year','internet_service_type_Fiber optic', 'internet_service_type_None','payment_type_Electronic check']]
+    y_test4 = test.churn_encoded
+    
+    clf4 = DecisionTreeClassifier(max_depth=7, random_state=123)
+    
+    clf4 = clf4.fit(X_train4, y_train4)
+    
+    clf4.predict(X_train4)[:20]
+    
+    clf4.score(X_train4, y_train4)
+    
+    y_pred4 = clf4.predict(X_train4)
+    
+    conf4 = confusion_matrix(y_train4, y_pred4)
+
+    labels4 = sorted(y_train4.unique())
+
+    pd.DataFrame(conf4)
+    
+    print(classification_report(y_train4, y_pred4))
+    
+    print(f"Accuracy of Decision Tree on train data is {clf4.score(X_train4, y_train4)}")
+    print(f"Accuracy of Decision Tree on validate data is {clf4.score(X_validate4, y_validate4)}")
+#------------------------------------------------------------------------------
+def get_SelectKBest_KNN(train, validate, test):
+    from sklearn.neighbors import KNeighborsClassifier
+    
+    X_train4 = train[['tenure_scaled', 'contract_type_Two year','internet_service_type_Fiber optic', 'internet_service_type_None','payment_type_Electronic check']]
+    y_train4 = train.churn_encoded
+    
+    X_validate4 = validate[['tenure_scaled', 'contract_type_Two year','internet_service_type_Fiber optic', 'internet_service_type_None','payment_type_Electronic check']]
+    y_validate4 = validate.churn_encoded
+    
+    X_test4 = test[['tenure_scaled', 'contract_type_Two year','internet_service_type_Fiber optic', 'internet_service_type_None','payment_type_Electronic check']]
+    y_test4 = test.churn_encoded
+    
+    knn3 = KNeighborsClassifier(n_neighbors=5, weights='uniform')
+    
+    knn3.fit(X_train4, y_train4)
+    
+    y_pred1 = knn3.predict(X_train4)
+    
+    y_pred_proba = knn3.predict_proba(X_train4)
+    
+    print('Accuracy of KNN classifier on training set: {:.2f}'
+     .format(knn3.score(X_train4, y_train4)))
+    print('Accuracy of KNN classifier on validate set: {:.2f}'
+     .format(knn3.score(X_validate4, y_validate4)))
+    
+#------------------------------------------------------------------------------
+def get_SelectKBest_RandomForest(train, validate, test):
+    from sklearn.ensemble import RandomForestClassifier
+
+    X_train4 = train[['tenure_scaled', 'contract_type_Two year','internet_service_type_Fiber optic', 'internet_service_type_None','payment_type_Electronic check']]
+    y_train4 = train.churn_encoded
+    
+    X_validate4 = validate[['tenure_scaled', 'contract_type_Two year','internet_service_type_Fiber optic', 'internet_service_type_None','payment_type_Electronic check']]
+    y_validate4 = validate.churn_encoded
+    
+    X_test4 = test[['tenure_scaled', 'contract_type_Two year','internet_service_type_Fiber optic', 'internet_service_type_None','payment_type_Electronic check']]
+    y_test4 = test.churn_encoded
+    
+    rf3 = RandomForestClassifier(bootstrap=True, 
+                            class_weight=None, 
+                            criterion='gini',
+                            min_samples_leaf=3,
+                            n_estimators=100,
+                            max_depth=7, 
+                            random_state=123)
+    
+    rf3.fit(X_train4, y_train4)
+    
+    y_pred = rf3.predict(X_train4)
+    
+    y_pred_proba = rf3.predict_proba(X_train4)
+    
+    print('Accuracy of random forest classifier on training set: {:.2f}'
+     .format(rf3.score(X_train4, y_train4)))
+    print('Accuracy of random forest classifier on validate set: {:.2f}'
+     .format(rf3.score(X_validate4, y_validate4)))
+
+#------------------------------------------------------------------------------
+def get_SelectKBest_RandomForest_Test(train, validate, test):
+    from sklearn.ensemble import RandomForestClassifier
+
+    X_train4 = train[['tenure_scaled', 'contract_type_Two year','internet_service_type_Fiber optic', 'internet_service_type_None','payment_type_Electronic check']]
+    y_train4 = train.churn_encoded
+    
+    X_validate4 = validate[['tenure_scaled', 'contract_type_Two year','internet_service_type_Fiber optic', 'internet_service_type_None','payment_type_Electronic check']]
+    y_validate4 = validate.churn_encoded
+    
+    X_test4 = test[['tenure_scaled', 'contract_type_Two year','internet_service_type_Fiber optic', 'internet_service_type_None','payment_type_Electronic check']]
+    y_test4 = test.churn_encoded
+    
+    
+    rf5 = RandomForestClassifier(bootstrap=True, 
+                            class_weight=None, 
+                            criterion='gini',
+                            min_samples_leaf=3,
+                            n_estimators=100,
+                            max_depth=7, 
+                            random_state=123)
+    
+    rf5.fit(X_train4, y_train4)
+    
+    y_pred = rf5.predict(X_train4)
+    
+    y_pred_proba = rf5.predict_proba(X_train4)
+    
+    print('Accuracy of random forest classifier on Training set: {:.2f}'
+     .format(rf5.score(X_train4, y_train4)))
+    print('Accuracy of random forest classifier on Validate set: {:.2f}'
+     .format(rf5.score(X_validate4, y_validate4)))
+    print('Accuracy of random forest classifier on Test set: {:.2f}'
+     .format(rf5.score(X_test4, y_test4)))
+    
+
+#------------------------------------------------------------------------------
+def scale_the_data(train, validate, test):
+    from sklearn.preprocessing import MinMaxScaler
+
+    continuous_features = ['monthly_charges', 'total_charges', 'tenure']
+    scaler = MinMaxScaler()
+    scaler.fit(train[continuous_features])
+    
+    train[['monthly_charges_scaled', 'total_charges_scaled', 'tenure_scaled']] = scaler.transform(train[continuous_features])
+    train = train.drop(columns = ['monthly_charges', 'total_charges', 'tenure'])
+    
+    continuous_features = ['monthly_charges', 'total_charges', 'tenure']
+    scaler = MinMaxScaler()
+    scaler.fit(validate[continuous_features])
+    
+    validate[['monthly_charges_scaled', 'total_charges_scaled', 'tenure_scaled']] = scaler.transform(validate[continuous_features])
+    validate = validate.drop(columns=['monthly_charges', 'total_charges', 'tenure'])
+    
+    continuous_features = ['monthly_charges', 'total_charges', 'tenure']
+    scaler = MinMaxScaler()
+    scaler.fit(test[continuous_features])
+    
+    test[['monthly_charges_scaled', 'total_charges_scaled', 'tenure_scaled']] = scaler.transform(test[continuous_features])
+    test = test.drop(columns=['monthly_charges', 'total_charges', 'tenure'])
+    
+    return train, validate, test
+
+#------------------------------------------------------------------------------
+

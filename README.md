@@ -132,7 +132,12 @@ Accuracy of random forest classifier on Training set: 0.81
 Accuracy of random forest classifier on Validate set: 0.78
 Accuracy of random forest classifier on Test set: 0.79
 
-Ultimately, my Random Forest Model beat the baseline by 6% and the biggest driving features of churn were tenure_scaled, contract_type_Two year, internet_service_type_Fiber optic, internet_service_type_None, and payment_type_Electronic check.
+Ultimately, my Random Forest Model beat the baseline by 6% and the biggest driving features of churn were:
+- Tenure
+- Contract_type_Two year
+- Internet_service_type_Fiber optic
+- Internet_service_type_None
+- Payment_type_Electronic check
 
 ***    
 <a name="Next_Steps"></a><h3><b>Next Steps:</b></h3>
